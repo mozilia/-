@@ -2,10 +2,134 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>demo</title>
-	<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+	<title>唤醒APP</title>
+	<meta name="viewport" content="initial-scale=1, width=device-width, maximum-scale=1, user-scalable=no">
+	<script src="https://cdn.bootcss.com/zepto/1.0rc1/zepto.min.js"></script>
 </head>
 <body>
-	<a href="taobao://">打开APP</a>
+	<a href="{dataRedirecturl}" class="call-app-btn" id="openApp" data-url="imeituan://www.meituan.com/home/">打开美团APP</a>
+	<a class="download-btn" id="downloadApp">下载</a>
 </body>
 </html>
+<script>
+	
+// require(["zepto.js",'util/cookie.js', 'count.js'], function ($,cookie,count){
+    
+    var mtDownloadUrl = {
+        android: 'http://www.meituan.com/mobile/download/meituan/android/imeituan/waputm_wxfuwuhao?from=touch',
+        ios: "https://itunes.apple.com/cn/app/mei-tuan-tuan-gou-tuan-gou/id423084029?mt=8",
+        qq: 'http://www.meituan.com/mobile/download/meituan/android/qqllq_kuailian_m?from=new'
+    };
+    var ua = navigator.userAgent,
+        isAndroid = ua.match(/android/i),
+        isIos = ua.match(/(ipad|iphone|ipod).*os\s([\d_]+)/i),
+        isWeChat = (/MicroMessenger/i.test(ua)); 
+    // function utmCreact() {
+    //     //utm统计数据
+    //     var utm = cookie.get('__utmz') || '';
+    //     var utmArr = count.Mlog.splitUtmz(utm);
+    //     var utmQa = [];
+    //     var isQQ = false;
+    //     if(utmArr['utmcsr']) {
+    //         utmQa.push(['utm_source', utmArr['utmcsr']]);
+    //     }
+    //     if(utmArr['utmccn']) {
+    //         utmQa.push(['utm_content', utmArr['utmccn']]);
+    //     }
+    //     if(utmArr['utmcmd']) {
+    //         utmQa.push(['utm_medium', utmArr['utmcmd']]);
+    //     }
+    //     utm = utmQa.map(function(item){
+    //         return item.join('=');
+    //     }).join('&');
+    //     var lch = "lch=" + (cookie.get('mtlaunch') || '');
+    //     lch = lch + "&" + utm;
+    //     // qq浏览器渠道
+    //     if (utmArr['utmcsr'] == 'waputm_qqmz' && utmArr['utmcmd'] == 'wap') {
+    //         isQQ = true;
+    //     }
+    //     return {
+    //         isQQ: isQQ,
+    //         lch: lch
+    //     }
+    // }
+    $("#downloadApp").on("click",function(e){
+        var obj = utmCreact();
+        //阻止默认行为
+        e.preventDefault();
+        var query = location.search;
+        if (isAndroid && obj.isQQ) {
+            url = mtDownloadUrl.qq;
+        } else if (isIos) {
+            url = mtDownloadUrl.ios;
+        } else if (isAndroid) {
+            url = mtDownloadUrl.android;
+        }
+        window.location.href = url;
+
+        // 埋点
+        if (window.Analytics) {
+            var url = window.location.href;
+            Analytics('event', {
+                nm: 'mge',
+                event_type: "click",
+                val_bid: 'b_w4kyjalz',
+                val_lab: {
+                    "custom": {
+                        "url": url
+                    }
+                }
+            });
+        }
+    });
+
+    $("#openApp").on("click",function(e){
+        var obj = utmCreact();
+        e.preventDefault();
+        var dataRedirecturl = $(this).data("url");
+        if (dataRedirecturl.indexOf("?") >= 0) {
+            dataRedirecturl = $(this).data("url") + "&" + obj.lch;
+        } else {
+            dataRedirecturl = $(this).data("url") + "?" + obj.lch;
+        }
+        if (isWeChat) {
+            //微信里面的唤起经过中间页
+            window.location.href = "https://m.dianping.com/awp/hfe/block-page/call-native/meituan.html?url=" + encodeURIComponent(dataRedirecturl);
+        } else {
+            if (isAndroid) {
+
+                //三星手机单独判断
+                if(ua.indexOf("SAMSUNG") > 0 || ua.indexOf("Samsung") > 0) {
+                    window.location.href = '/client';
+                    return
+                }
+
+                /*
+                 * 安卓利用一个iframe 尝试跳转到app schema
+                 * */
+                var div = document.createElement('div');
+                div.style.visibility = 'hidden';
+                div.innerHTML = "<iframe src=\"" + dataRedirecturl + "\" scrolling=\"no\" width=\"1\" height=\"1\"></iframe>";
+                document.body.appendChild(div);
+            } else if (isIos) {
+                window.location = dataRedirecturl;
+            }
+        }
+
+        //埋点
+        if (window.Analytics) {
+            var url = window.location.href;
+            Analytics('event', {
+                nm: 'mge',
+                event_type: "click",
+                val_bid: 'b_qjez82tj',
+                val_lab: {
+                    "custom": {
+                        "url": url
+                    }
+                }
+            });
+        }
+    });
+// });
+</script>
