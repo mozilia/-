@@ -12,47 +12,46 @@
 </body>
 </html>
 <script>
-	
-// require(["zepto.js",'util/cookie.js', 'count.js'], function ($,cookie,count){
+	console.log(navigator.userAgent)
+require(["zepto.js",'util/cookie.js', 'count.js'], function ($,cookie,count){
     
     var mtDownloadUrl = {
         android: 'http://www.meituan.com/mobile/download/meituan/android/imeituan/waputm_wxfuwuhao?from=touch',
         ios: "https://itunes.apple.com/cn/app/mei-tuan-tuan-gou-tuan-gou/id423084029?mt=8",
         qq: 'http://www.meituan.com/mobile/download/meituan/android/qqllq_kuailian_m?from=new'
     };
-    var ua = navigator.userAgent,
-        isAndroid = ua.match(/android/i),
+    var ua = navigator.userAgent,isAndroid = ua.match(/android/i),
         isIos = ua.match(/(ipad|iphone|ipod).*os\s([\d_]+)/i),
         isWeChat = (/MicroMessenger/i.test(ua)); 
-    // function utmCreact() {
-    //     //utm统计数据
-    //     var utm = cookie.get('__utmz') || '';
-    //     var utmArr = count.Mlog.splitUtmz(utm);
-    //     var utmQa = [];
-    //     var isQQ = false;
-    //     if(utmArr['utmcsr']) {
-    //         utmQa.push(['utm_source', utmArr['utmcsr']]);
-    //     }
-    //     if(utmArr['utmccn']) {
-    //         utmQa.push(['utm_content', utmArr['utmccn']]);
-    //     }
-    //     if(utmArr['utmcmd']) {
-    //         utmQa.push(['utm_medium', utmArr['utmcmd']]);
-    //     }
-    //     utm = utmQa.map(function(item){
-    //         return item.join('=');
-    //     }).join('&');
-    //     var lch = "lch=" + (cookie.get('mtlaunch') || '');
-    //     lch = lch + "&" + utm;
-    //     // qq浏览器渠道
-    //     if (utmArr['utmcsr'] == 'waputm_qqmz' && utmArr['utmcmd'] == 'wap') {
-    //         isQQ = true;
-    //     }
-    //     return {
-    //         isQQ: isQQ,
-    //         lch: lch
-    //     }
-    // }
+    function utmCreact() {
+        //utm统计数据
+        var utm = cookie.get('__utmz') || '';
+        var utmArr = count.Mlog.splitUtmz(utm);
+        var utmQa = [];
+        var isQQ = false;
+        if(utmArr['utmcsr']) {
+            utmQa.push(['utm_source', utmArr['utmcsr']]);
+        }
+        if(utmArr['utmccn']) {
+            utmQa.push(['utm_content', utmArr['utmccn']]);
+        }
+        if(utmArr['utmcmd']) {
+            utmQa.push(['utm_medium', utmArr['utmcmd']]);
+        }
+        utm = utmQa.map(function(item){
+            return item.join('=');
+        }).join('&');
+        var lch = "lch=" + (cookie.get('mtlaunch') || '');
+        lch = lch + "&" + utm;
+        // qq浏览器渠道
+        if (utmArr['utmcsr'] == 'waputm_qqmz' && utmArr['utmcmd'] == 'wap') {
+            isQQ = true;
+        }
+        return {
+            isQQ: isQQ,
+            lch: lch
+        }
+    }
     $("#downloadApp").on("click",function(e){
         var obj = utmCreact();
         //阻止默认行为
@@ -131,5 +130,5 @@
             });
         }
     });
-// });
+});
 </script>
