@@ -1,3 +1,4 @@
+console.log(123)
 define([],
 function() {
     var MT = window.MT || {};
